@@ -4,7 +4,6 @@ object FormMain: TFormMain
   Top = 32
   Width = 400
   Caption = 'FormMain'
-  OnClick = FormClick
   OnCreate = FormCreate
   OnPaint = FormPaint
   LCLVersion = '3.4.0.0'
@@ -13,6 +12,11 @@ object FormMain: TFormMain
     Tag = 16
     Interval = 16
     OnTimer = TimerPhysicsTimer
+    Left = 8
+    Top = 8
+  end
+  object CreateFireworkTimer: TTimer
+    OnTimer = CreateFireworkTimerTimer
     Left = 8
     Top = 8
   end

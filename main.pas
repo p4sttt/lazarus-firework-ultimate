@@ -9,50 +9,37 @@ uses
   Particle, Math;
 
 const
-  ParticlesCount = 50;
+  ParticlesCount = 20;
 
   MinSize = 4;
   MaxSize = 6;
 
-  MinVelocityX = -5;
-  MaxVelocityX = 5;
+  MinVelocityX = -1.5;
+  MaxVelocityX = 1.5;
 
-  MinVelocityY = -3;
-  MaxVelocityY = -10;
+  MinVelocityY = 0;
+  MaxVelocityY = -4;
 
-  ColorStep = 3;
+  ColorStep = 1;
 
-  SizeCoefX = 0.8;
-  SizeCoefY = 0.75;
-
-  Colors: array[1..10] of TColor = (
-    TColor($FF8A8AFF),
-    TColor($9DBDFFFF),
-    TColor($0D7C66FF),
-    TColor($F5F7F8FF),
-    TColor($7C00FEFF),
-    TColor($FDFFC2FF),
-    TColor($98EECCFF),
-    TColor($FFA3FDFF),
-    TColor($14C38EFF),
-    TColor($94B3FDFF)
-    );
+  BoundsOffset = 50;
 
 type
 
   { TFormMain }
 
   TFormMain = class(TForm)
+    CreateFireworkTimer: TTimer;
     TimerPhysics: TTimer;
 
-    procedure FormClick(Sender: TObject);
+    procedure CreateFireworkTimerTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormPaint(Sender: TObject);
     procedure TimerPhysicsTimer(Sender: TObject);
 
   private
     Particles: array[1..ParticlesCount] of TParticle;
-    PColor: TColor;
+    PColor: byte;
     IsCreated: boolean;
 
     procedure MakeParticles(X, Y: single);
@@ -77,13 +64,13 @@ begin
   FormMain.Top := (Screen.Height - ClientHeight) div 2;
 end;
 
-procedure TFormMain.FormClick(Sender: TObject);
+procedure TFormMain.CreateFireworkTimerTimer(Sender: TObject);
 var
-  Pt: TPoint;
+  X, Y: integer;
 begin
-  Pt := Mouse.CursorPos;
-  Pt := ScreenToClient(Pt);
-  MakeParticles(Pt.X, Pt.Y);
+  X := RandomRange(BoundsOffset, ClientWidth - BoundsOffset);
+  Y := RandomRange(BoundsOffset, ClientHeight - BoundsOffset);
+  MakeParticles(X, Y);
 end;
 
 procedure TFormMain.FormPaint(Sender: TObject);
@@ -97,7 +84,7 @@ begin
 
   if isCreated then
   begin
-    Canvas.Brush.Color := PColor;
+    Canvas.Brush.Color := RGBToColor(PColor, PColor, PColor);
     for I := 0 to High(Particles) do
     begin
       X := Trunc(Particles[I].X);
@@ -120,12 +107,12 @@ var
   Vx, Vy: single;
 begin
   IsCreated := True;
-  PColor := Colors[RandomRange(Low(Colors), High(Colors) + 1)];
+  PColor := 255;
   for I := 1 to High(Particles) do
   begin
     Size := RandomRange(MinSize, MaxSize);
-    Vx := (MinVelocityX + Random * (MaxVelocityX - MinVelocityX)) / (Size * SizeCoefX);
-    Vy := (MinVelocityY + Random * (MaxVelocityY - MinVelocityY)) / (Size * SizeCoefY);
+    Vx := MinVelocityX + Random * (MaxVelocityX - MinVelocityX);
+    Vy := MinVelocityY + Random * (MaxVelocityY - MinVelocityY);
     Particles[I] := TParticle.Create(Size, X, Y, Vx, Vy);
   end;
 end;
@@ -133,12 +120,8 @@ end;
 procedure TFormMain.UpdateParticles;
 var
   I: integer;
-  R, G, B: byte;
 begin
-  R := Max(Red(PColor) - ColorStep, 0);
-  G := Max(Green(PColor) - ColorStep, 0);
-  B := Max(Blue(PColor) - ColorStep, 0);
-  PColor := RGBToColor(R, G, B);
+  PColor := Max(PColor - ColorStep, 0);
   for I := 1 to High(Particles) do
   begin
     Particles[I].Update;

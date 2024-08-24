@@ -36,8 +36,6 @@ type
     constructor Create; overload;
 
     procedure Update;
-    procedure InverseVx;
-    procedure InverseVy;
 
     property Size: integer read GetSize write SetSize;
     property X: single read GetX write SetX;
@@ -114,9 +112,6 @@ procedure TParticle.UpdateVelocity;
 begin
   Self.Vx := Self.Vx + g.X;
   Self.Vy := Self.Vy + g.Y;
-
-  if Abs(Self.Vx) < MinVelocity then Self.Vx := 0;
-  if Abs(Self.Vy) < MinVelocity then Self.Vy := 0;
 end;
 
 constructor TParticle.Create(ASize: integer; AX, AY, AVx, AVy: single);
@@ -141,16 +136,6 @@ procedure TParticle.Update;
 begin
   Self.UpdatePosition;
   Self.UpdateVelocity;
-end;
-
-procedure TParticle.InverseVx;
-begin
-  Self.Vx := -Self.Vx * VelocityLossCoef;
-end;
-
-procedure TParticle.InverseVy;
-begin
-  Self.Vy := -Self.Vy * VelocityLossCoef;
 end;
 
 end.
